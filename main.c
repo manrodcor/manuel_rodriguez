@@ -5,8 +5,8 @@
 
 // TODO: Crea dos macros con el tamaño horizontal y vertical del mundo
 
-#define TAM_HOR 4
-#define TAM_VER 4
+#define TAM_HOR 10
+#define TAM_VER 10
 
 void world_init(bool *matriz);
 void world_print(bool *matriz);/* Recibo un mundo */
@@ -126,7 +126,6 @@ void world_step(bool matriz01[TAM_VER][TAM_HOR], bool matriz02[TAM_VER][TAM_HOR]
 	int v;	//numero de vecinos
 	bool estado;//Estado de la celda
 
-	printf("\nLlegue ");
 	for(i = 0; i < TAM_VER; i++){
 		for(j = 0; j < TAM_HOR; j++){
 			v = world_count_neighbors(matriz01, i, j);
@@ -136,6 +135,9 @@ void world_step(bool matriz01[TAM_VER][TAM_HOR], bool matriz02[TAM_VER][TAM_HOR]
 			}
 			else if((estado == true) & (v > 1) & (v < 4)){
 				matriz02[i][j] = false;			
+			}
+			else{
+				matriz02[i][j] = false;
 			}
 		}
 	}
