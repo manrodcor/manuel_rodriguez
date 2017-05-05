@@ -83,9 +83,9 @@ bool world_get_cell(const struct world *mundo, int i, int j)
 		i = 0;
 	}
 	if(j == -1){
-		j = TAM_VER -1;
+		j = TAM_HOR -1;
 	}
-	else if(j == TAM_VER){
+	else if(j == TAM_HOR){
 		j = 0;
 	}
 	return mundo->mundo01[i][j];

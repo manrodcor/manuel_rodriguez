@@ -1,12 +1,12 @@
 #ifndef GOL_H_
 #define GOL_H_
 
-#include <stdio.h>
+//<stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define TAM_HOR 8
-#define TAM_VER 8
+#define TAM_HOR 10
+#define TAM_VER 10
 
 struct world{
 	bool mundo01[TAM_VER][TAM_HOR];
