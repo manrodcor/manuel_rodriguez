@@ -4,14 +4,16 @@
 #include "gol.h"
 
 
-void world_init(bool matriz[TAM_VER][TAM_HOR])
+
+void world_init(struct world *mundo)
 {
 	//Poner el mundo a false
-	int i;
-	int j;
+	int i = 0;
+	int j = 0;
 	for(i = 0; i < TAM_VER; i++){
 		for(j = 0; j < TAM_HOR; j++){
-			matriz[i][j] = false;
+			mundo->mundo01[i][j] = false;
+			mundo->mundo02[i][j] = false;
 		}
 	}
 
@@ -21,27 +23,27 @@ void world_init(bool matriz[TAM_VER][TAM_HOR])
 	 *           # # #
 	 */
 
-	matriz[0][1] = true;
-	matriz[1][2] = true;
-	matriz[2][0] = true;
-	matriz[2][1] = true;
-	matriz[2][2] = true;
+	mundo->mundo01[0][1] = true;
+	mundo->mundo01[1][2] = true;
+	mundo->mundo01[2][0] = true;
+	mundo->mundo01[2][1] = true;
+	mundo->mundo01[2][2] = true;
 	
 }
 
-void world_print(bool matriz[TAM_VER][TAM_HOR])
+void world_print(const struct world *mundo)
 {
 	int i = 0;
 	int j = 0;
 	for(i = 0; i < TAM_VER; i++){
 		for(j = 0; j < TAM_HOR; j++){
-			printf("%s ", matriz[i][j] ? "#" : ".");
+			printf("%s ", mundo->mundo01[i][j] ? "#" : ".");
 		}
 		printf("\n");
 	}
 }
 
-void world_step(bool matriz01[TAM_VER][TAM_HOR], bool matriz02[TAM_VER][TAM_HOR])
+void world_step(struct world *mundo)
 {
 	int i = 0;
 	int j = 0;	
@@ -49,31 +51,32 @@ void world_step(bool matriz01[TAM_VER][TAM_HOR], bool matriz02[TAM_VER][TAM_HOR]
 
 	for(i = 0; i < TAM_VER; i++){
 		for(j = 0; j < TAM_HOR; j++){
-			nVecinos = world_count_neighbors(matriz01, i, j);
-			matriz02[i][j] = (matriz01[i][j] && nVecinos == 2) || nVecinos == 3;
+			nVecinos = world_count_neighbors(mundo, i, j);
+			mundo->mundo02[i][j] = (mundo->mundo01[i][j] && nVecinos == 2) || nVecinos == 3;
 		}
 	}
-	world_copy(matriz01, matriz02);
+	world_copy(mundo);
 }
 
-int world_count_neighbors(bool matriz[TAM_VER][TAM_HOR], int i, int j)
+int world_count_neighbors(const struct world *mundo, int i, int j)
 {
 	int numeroVecinos = 0;
 	
-	numeroVecinos += world_get_cell(matriz, i, j - 1);
-	numeroVecinos += world_get_cell(matriz, i - 1, j - 1);
-	numeroVecinos += world_get_cell(matriz, i - 1, j);
-	numeroVecinos += world_get_cell(matriz, i - 1, j + 1);
-	numeroVecinos += world_get_cell(matriz, i, j + 1);
-	numeroVecinos += world_get_cell(matriz, i + 1, j + 1);
-	numeroVecinos += world_get_cell(matriz, i + 1, j);
-	numeroVecinos += world_get_cell(matriz, i + 1, j - 1);
+	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i, j - 1);
+	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i - 1, j - 1);
+	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i - 1, j);
+	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i - 1, j + 1);
+	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i, j + 1);
+	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i + 1, j + 1);
+	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i + 1, j);
+	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i + 1, j - 1);
 	
 	return numeroVecinos;
 }
 
-bool world_get_cell(bool matriz[TAM_VER][TAM_HOR], int i, int j)
+bool world_get_cell(const struct world *mundo, int i, int j)
 {
+	bool estado;
 	if(i == -1){
 		i = TAM_VER -1;
 	}
@@ -86,16 +89,17 @@ bool world_get_cell(bool matriz[TAM_VER][TAM_HOR], int i, int j)
 	else if(j == TAM_VER){
 		j = 0;
 	}
-	return matriz[i][j];
+	estado = mundo->mundo01[i][j];
+	return estado;
 }
 
-void world_copy(bool matriz01[TAM_VER][TAM_HOR], bool matriz02[TAM_VER][TAM_HOR])
+void world_copy(struct world *mundo)
 {
 	int i,j;
 
 	for(i = 0; i < TAM_VER; i++){
 		for(j = 0; j < TAM_HOR; j++){
-			matriz01[i][j] = matriz02[i][j];	
+			mundo->mundo01[i][j] = mundo->mundo02[i][j];	
 		}
 	}
 }
