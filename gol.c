@@ -8,8 +8,8 @@
 void world_init(struct world *mundo)
 {
 	//Poner el mundo a false
-	int i = 0;
-	int j = 0;
+	int i;
+	int j;
 	for(i = 0; i < TAM_VER; i++){
 		for(j = 0; j < TAM_HOR; j++){
 			mundo->mundo01[i][j] = false;
@@ -33,8 +33,8 @@ void world_init(struct world *mundo)
 
 void world_print(const struct world *mundo)
 {
-	int i = 0;
-	int j = 0;
+	int i;
+	int j;
 	for(i = 0; i < TAM_VER; i++){
 		for(j = 0; j < TAM_HOR; j++){
 			printf("%s ", mundo->mundo01[i][j] ? "#" : ".");
@@ -45,8 +45,8 @@ void world_print(const struct world *mundo)
 
 void world_step(struct world *mundo)
 {
-	int i = 0;
-	int j = 0;	
+	int i;
+	int j;	
 	int nVecinos;
 
 	for(i = 0; i < TAM_VER; i++){
@@ -62,21 +62,20 @@ int world_count_neighbors(const struct world *mundo, int i, int j)
 {
 	int numeroVecinos = 0;
 	
-	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i, j - 1);
-	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i - 1, j - 1);
-	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i - 1, j);
-	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i - 1, j + 1);
-	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i, j + 1);
-	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i + 1, j + 1);
-	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i + 1, j);
-	numeroVecinos += world_get_cell((struct world*)mundo->mundo01, i + 1, j - 1);
+	numeroVecinos += world_get_cell(mundo, i, j - 1);
+	numeroVecinos += world_get_cell(mundo, i - 1, j - 1);
+	numeroVecinos += world_get_cell(mundo, i - 1, j);
+	numeroVecinos += world_get_cell(mundo, i - 1, j + 1);
+	numeroVecinos += world_get_cell(mundo, i, j + 1);
+	numeroVecinos += world_get_cell(mundo, i + 1, j + 1);
+	numeroVecinos += world_get_cell(mundo, i + 1, j);
+	numeroVecinos += world_get_cell(mundo, i + 1, j - 1);
 	
 	return numeroVecinos;
 }
 
 bool world_get_cell(const struct world *mundo, int i, int j)
 {
-	bool estado;
 	if(i == -1){
 		i = TAM_VER -1;
 	}
@@ -89,13 +88,13 @@ bool world_get_cell(const struct world *mundo, int i, int j)
 	else if(j == TAM_VER){
 		j = 0;
 	}
-	estado = mundo->mundo01[i][j];
-	return estado;
+	return mundo->mundo01[i][j];
 }
 
 void world_copy(struct world *mundo)
 {
-	int i,j;
+	int i;
+	int j;
 
 	for(i = 0; i < TAM_VER; i++){
 		for(j = 0; j < TAM_HOR; j++){
