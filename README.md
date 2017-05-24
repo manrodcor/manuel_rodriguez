@@ -59,3 +59,68 @@ int main()
 	return EXIT_SUCCESS;
 }
 
+
+TAREA 4: Objetos: Reserva dinámica de memoria
+Interfaz pública
+
+gol.h
+
+struct world;
+
+struct world *world_alloc(int size_x, int size_y);
+void world_free(struct world *w);
+
+void world_print(const struct world *w);
+void world_iterate(struct world *w);
+
+    world_alloc: Reserva en memoria e inicializa nuestro objeto struct world. Esto implica reservar memoria para la estrucutra y para los dos arrays que tiene dentro.
+    world_free: Libera la memoria que ocupa nuestro objeto. Esto implica liberar primero la memoria de los arrays que tiene dentro la estrucutra, y luego la propia estructura.
+    world_print: Imprime el mundo
+    world_iterate: Realiza una iteración del juego de la vida 
+
+
+Implementación (privada)
+
+gol.c
+
+struct world
+{
+	bool *cells[2];
+	int size_x;
+	int size_y;
+};
+
+static void fix_coords(const struct world *w, int *x, int *y);
+static bool get_cell(const struct world *w, int x, int y);
+static void set_cell(struct world *w, int buf, int x, int y, bool val);
+static int count_neighbors(const struct world *w, int x, int y);
+
+/* ... */
+/* Definiciones de funciones privadas y públicas */
+/* ... */
+
+    fix_coords: Recibe unas coordenadas (x,y) y las modifica para implementar un mundo toroidal
+    get_cell: Devuelve la célula en la posición (x,y), arreglando las coordenadas.
+    set_cell: Cambia el valor de la célula de la posición (x,y), arreglando las coordenadas.
+    count_neighbors: Cuenta las células vecinas haciendo uso de la función get_cell 
+
+NOTAS
+
+    No olvides comprobar que has podido realizar correctamente la reserva de memoria: 
+
+En world_alloc():
+
+w = (struct world *)malloc(sizeof(struct world));
+if (!w)
+	return NULL;
+
+En main():
+
+w = world_alloc(WORLD_X, WORLD_Y);
+if (!w) {
+	perror("Can't allocate world");
+	exit(EXIT_FAILURE);
+}
+
+    Las funciones privadas se declaran como static y no aparecen el el .h
+    Ahora debes calcular a mano el offset en el array para llegar a la célula (x,y) con la fórmula: size_x*y + x. Encapsula esta fórmula en las funciones get_cell y set_cell. 
