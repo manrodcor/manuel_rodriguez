@@ -2,18 +2,29 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include "gol.h"
+#include "config.h"
+#include <getopt.h>
 
-int main()
+int main(int argc, char *argv[])
 {
 	int i = 0;
+	struct config configuracion;
 	struct world *w;
 
-	w = world_alloc(WORLD_X, WORLD_Y);
+	if (!config_parse_argv(&configuracion, argc, argv)) {
+		printf("ERROR\n");
+		config_print_usage(argv[0]);
+		return EXIT_FAILURE;
+	}
+	else if (configuracion.show_help){
+		config_print_usage(argv[0]);
+		return EXIT_SUCCESS;
+	}
+	w = world_alloc(&configuracion);
 	if (!w) {
-		printf("Can't allocate world");
+		perror("Can't allocate world");
 		exit(EXIT_FAILURE);
 	}
-
 	do {
 		printf("\033cIteration %d\n", i++);
 		world_print(w);
@@ -23,3 +34,4 @@ int main()
 
 	return EXIT_SUCCESS;
 }
+

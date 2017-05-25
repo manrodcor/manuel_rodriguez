@@ -1,7 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 #include <stdbool.h>
+#include "config.h"
+#include <getopt.h>
 #include "gol.h"
+
 
 struct world
 {
@@ -15,46 +19,78 @@ static void fix_coords(const struct world *w, int *x, int *y);
 static bool get_cell(const struct world *w, int x, int y);
 static void set_cell(struct world *w, int buf, int x, int y, bool val);
 static int count_neighbors(const struct world *w, int x, int y);
+static float frand();
+static int rrand(int from, int to);
 
 
-struct world *world_alloc(int tam_x, int tam_y)
+struct world *world_alloc(struct config *configuracion)
 {
 	int i, j;
-	struct world * w;
+	bool valor;
+	struct world *w;
 	w = malloc(2 * sizeof(struct world));
 	if(!w){
 		return NULL;
 	}
-	w->size_x = tam_x;
-	w->size_y = tam_y;
+
+	int modo = configuracion->init_mode;
+	w->size_x = configuracion->size_x;;
+	w->size_y = configuracion->size_y;;
 	w->flanco = false;
 	w->cells[0] = (bool *)malloc(w->size_x * w->size_y * sizeof(bool));
 	w->cells[1] = (bool *)malloc(w->size_x * w->size_y * sizeof(bool));
-	
 
 	if(!w->cells[0] || !w->cells[1]){
-		if(!w->cells[1] && w->cells[0]){
-			free(w->cells[0]);
-		}
-		if(!w->cells[0] && w->cells[1]){
+		if(!w->cells[0]){
 			free(w->cells[1]);
+		}
+		if(!w->cells[1]){
+			free(w->cells[0]);
 		}
 		free(w);
 		return NULL;
 	}
+
 	for (i = 0; i < w->size_y; i++){
 		for (j = 0; j < w->size_x; j++){
-			set_cell(w, 0, i, j, false);
+			set_cell(w, 0, j, i, false);
 		}
 	}
-	
-	set_cell(w, 0, 0, 1, true);
-	set_cell(w, 0, 1, 2, true);
-	set_cell(w, 0, 2, 0, true);
-	set_cell(w, 0, 2, 1, true);
-	set_cell(w, 0, 2, 2, true);
+	if(modo == 0){
+		set_cell(w, 0, 1, 0, true);
+		set_cell(w, 0, 2, 0, true);
+		set_cell(w, 0, 0, 1, true);
+		set_cell(w, 0, 3, 1, true);
+		set_cell(w, 0, 1, 2, true);
+		set_cell(w, 0, 2, 2, true);
+		set_cell(w, 0, 3, 2, true);
+		set_cell(w, 0, 3, 3, true);
+	}
+	else if(modo == 1){
+		set_cell(w, 0, 1, 0, true);
+		set_cell(w, 0, 2, 1, true);
+		set_cell(w, 0, 0, 2, true);
+		set_cell(w, 0, 1, 2, true);
+		set_cell(w, 0, 2, 2, true);
+	}
+	else if(modo == 2){
+		srand(time(0)); //use current time as seed for random generator
 
+		for (i = 0; i < w->size_y; i++){
+			for (j = 0; j < w->size_x; j++){
+				valor = rrand(0, 1);
+				set_cell(w, 0, j, i, valor);
+			}
+		}
+	}
 	return w;
+}
+
+void world_free(struct world *w)
+{
+	free(w->cells[0]);
+	free(w->cells[1]);
+	free(w);
 }
 
 void world_print(const struct world *w)
@@ -64,27 +100,28 @@ void world_print(const struct world *w)
 
 	for (i = 0; i < w->size_y; i++){
 		for (j = 0; j < w->size_x; j++){
-			printf("%s ", get_cell(w, i, j) ? "#" : ".");
+			printf("%s ", get_cell(w, j, i) ? "#" : ".");
 		}
 		printf("\n");
 	}
+
 }
 
 void world_iterate(struct world *w)
 {
 	int i;
 	int j;
+	int selectMatriz;
 	int nVecinos;
-	int k1;
 	bool val;
 
-	k1 = !w->flanco;
-	
+	selectMatriz = !w->flanco;
+
 	for(i = 0; i < w->size_y; i++){
 		for(j = 0; j < w->size_x; j++){
-			nVecinos = count_neighbors(w, i, j);
-			val = (get_cell(w, i, j) && nVecinos == 2) || nVecinos == 3;
-			set_cell(w, k1, i, j, val);
+			nVecinos = count_neighbors(w, j, i);
+			val = (get_cell(w, j, i) && nVecinos == 2) || nVecinos == 3;
+			set_cell(w, selectMatriz, j, i, val);
 		}
 	}
 	w->flanco = !w->flanco;
@@ -110,13 +147,14 @@ static void fix_coords(const struct world *w, int *x, int *y)
 static bool get_cell(const struct world *w, int x, int y)
 {
 	fix_coords(w, &x, &y);
-        return w->cells[w->flanco][x * w->size_x + y];
+	return w->cells[w->flanco][y * w->size_x + x];
+
 }
 
 static void set_cell(struct world *w, int buf, int x, int y, bool val)
 {
 	fix_coords(w, &x, &y);
-	w->cells[buf][x * w->size_x + y] = val;
+	w->cells[buf][y * w->size_x + x] = val;
 }
 
 static int count_neighbors(const struct world *w, int x, int y)
@@ -135,9 +173,13 @@ static int count_neighbors(const struct world *w, int x, int y)
 	return numeroVecinos;
 }
 
-void world_free(struct world *w)
-{
-	free(w->cells[0]);
-	free(w->cells[1]);
-	free(w);
+float frand(){
+	return (float)rand()/RAND_MAX;
 }
+
+int rrand(int from, int to){
+	return rand()%(to - from + 1) + from;
+}
+
+
+
