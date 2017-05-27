@@ -1,3 +1,4 @@
+
 #include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
@@ -31,9 +32,9 @@ int config_parse_argv(struct config *configuracion, int argc, char *argv[])
 
 	// Default values
 	configuracion->show_help = false;
-	configuracion->size_x = 10;
-	configuracion->size_y = 14;
-	configuracion->init_mode = 0;
+	configuracion->size_x = 8;
+	configuracion->size_y = 8;
+	configuracion->init_mode = CFG_RANDOM;
 
 	while ((c = getopt_long(argc, argv, "hx:y:i:", long_options, &option_index)) != -1) {
 		switch (c) {
@@ -41,14 +42,16 @@ int config_parse_argv(struct config *configuracion, int argc, char *argv[])
 			configuracion->show_help = true;
 			break;
 		case 'x':
-			configuracion->size_x = strtol(optarg, NULL, NULL);
+			configuracion->size_x = strtol(optarg, NULL, 0);
 			break;
 		case 'y':
-			configuracion->size_y = strtol(optarg, NULL, NULL);
+			configuracion->size_y = strtol(optarg, NULL, 0);
 			break;
 		case 'i':
 			configuracion->init_mode = str2init_mode(optarg);
 			break;
+		case '?':
+			return false;
 		}
 	}
 

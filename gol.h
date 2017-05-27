@@ -1,5 +1,8 @@
+
 #ifndef GOL_H_
 #define GOL_H_
+
+#include "config.h"
 
 struct world *world_alloc(struct config *configuracion);
 void world_free(struct world *w);

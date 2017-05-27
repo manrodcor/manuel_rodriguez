@@ -1,9 +1,10 @@
+
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
 #include <stdbool.h>
 
-#define CFG_N_INIT_MODES (_CFG_MAX_)
+#define CFG_N_INIT_MODES (_CFG_MAX_) //probar sin -1
 
 enum cfg_init_mode {
 	CFG_NOT_DEF = -1,

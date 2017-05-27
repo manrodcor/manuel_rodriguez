@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
@@ -56,7 +57,7 @@ struct world *world_alloc(struct config *configuracion)
 			set_cell(w, 0, j, i, false);
 		}
 	}
-	if(modo == 0){
+	if(modo == CFG_DEFAULT){
 		set_cell(w, 0, 1, 0, true);
 		set_cell(w, 0, 2, 0, true);
 		set_cell(w, 0, 0, 1, true);
@@ -66,14 +67,14 @@ struct world *world_alloc(struct config *configuracion)
 		set_cell(w, 0, 3, 2, true);
 		set_cell(w, 0, 3, 3, true);
 	}
-	else if(modo == 1){
+	else if(modo == CFG_GLIDER){
 		set_cell(w, 0, 1, 0, true);
 		set_cell(w, 0, 2, 1, true);
 		set_cell(w, 0, 0, 2, true);
 		set_cell(w, 0, 1, 2, true);
 		set_cell(w, 0, 2, 2, true);
 	}
-	else if(modo == 2){
+	else if(modo == CFG_RANDOM){
 		srand(time(0)); //use current time as seed for random generator
 
 		for (i = 0; i < w->size_y; i++){
@@ -180,6 +181,4 @@ float frand(){
 int rrand(int from, int to){
 	return rand()%(to - from + 1) + from;
 }
-
-
 
