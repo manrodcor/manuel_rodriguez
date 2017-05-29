@@ -4,7 +4,7 @@
 
 #include <stdbool.h>
 
-#define CFG_N_INIT_MODES (_CFG_MAX_) //probar sin -1
+#define CFG_N_INIT_MODES (_CFG_MAX_)
 
 enum cfg_init_mode {
 	CFG_NOT_DEF = -1,
@@ -20,6 +20,7 @@ struct config {
 	int size_x;
 	int size_y;
 	enum cfg_init_mode init_mode;
+	char *cfg_file;
 };
 
 int config_parse_argv(struct config *configuracion, int argc, char *argv[]);

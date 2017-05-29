@@ -20,7 +20,6 @@ static void fix_coords(const struct world *w, int *x, int *y);
 static bool get_cell(const struct world *w, int x, int y);
 static void set_cell(struct world *w, int buf, int x, int y, bool val);
 static int count_neighbors(const struct world *w, int x, int y);
-static float frand();
 static int rrand(int from, int to);
 
 
@@ -174,11 +173,7 @@ static int count_neighbors(const struct world *w, int x, int y)
 	return numeroVecinos;
 }
 
-float frand(){
-	return (float)rand()/RAND_MAX;
-}
-
-int rrand(int from, int to){
+static int rrand(int from, int to){
 	return rand()%(to - from + 1) + from;
 }
 

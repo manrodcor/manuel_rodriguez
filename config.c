@@ -23,6 +23,7 @@ static const struct option long_options[] =
 
 static bool check_config(const struct config *configuracion);
 static enum cfg_init_mode str2init_mode(const char *opt);
+static bool load_config(struct config *configuracion);
 
 
 int config_parse_argv(struct config *configuracion, int argc, char *argv[])
@@ -51,6 +52,18 @@ int config_parse_argv(struct config *configuracion, int argc, char *argv[])
 			configuracion->init_mode = str2init_mode(optarg);
 			break;
 		case '?':
+			return false;
+		}
+	}
+
+	if (optind != argc){
+		if(optind == argc - 1) {
+			configuracion->cfg_file = argv[optind];
+			if(!load_config(configuracion)){
+				return false;
+			}
+		}
+		else{
 			return false;
 		}
 	}
@@ -91,7 +104,6 @@ void config_print_usage(const char *arg0)
 		"\t[-i|--init <init_mode>]\n"
 		, arg0);
 
-	// Print all initialization modes
 	printf("\ninitialization modes: ");
 	printf("\nModo %s ", init_mode_str[0]);
 	printf("\nModo %s ", init_mode_str[1]);
@@ -109,3 +121,43 @@ void config_print(const struct config *configuracion)
 	printf("}\n");
 }
 
+
+static bool load_config(struct config *configuracion){
+
+	FILE *archivo;
+	char linea[10];
+
+	archivo = fopen(configuracion->cfg_file, "r");
+	if(archivo == NULL){
+		exit(-1);
+	}
+
+	// Size x
+	fgets(linea, 10, archivo);
+	if (ferror(archivo)){
+		perror("Error reading config file");
+		return false;
+	}
+	configuracion->size_x = strtol(linea, NULL, 0);
+
+	// Size y
+	fgets(linea, 10, archivo);
+	if (ferror(archivo)){
+		perror("Error reading config file");
+		return false;
+	}
+	configuracion->size_y = strtol(linea, NULL, 0);
+
+	// Mode
+	fgets(linea, 10, archivo);
+	if (ferror(archivo)){
+		perror("Error reading config file");
+		return false;
+	}
+	linea[strlen(linea) - 1] = '\0';
+
+	configuracion->init_mode = str2init_mode(linea);
+
+	fclose(archivo);
+	return true;
+}
