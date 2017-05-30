@@ -126,10 +126,12 @@ static bool load_config(struct config *configuracion){
 
 	FILE *archivo;
 	char linea[10];
+	int i;
+	char target = '\n';
 
 	archivo = fopen(configuracion->cfg_file, "r");
 	if(archivo == NULL){
-		exit(-1);
+		return NULL;
 	}
 
 	// Size x
@@ -154,7 +156,14 @@ static bool load_config(struct config *configuracion){
 		perror("Error reading config file");
 		return false;
 	}
-	linea[strlen(linea) - 1] = '\0';
+	
+	if(strchr(linea, target) != NULL){
+		i = 0;
+		while(linea[i] != target){
+			i++;
+		}
+		linea[i] = '\0';
+	}
 
 	configuracion->init_mode = str2init_mode(linea);
 
