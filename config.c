@@ -126,8 +126,6 @@ static bool load_config(struct config *configuracion){
 
 	FILE *archivo;
 	char linea[10];
-	int i;
-	char target = '\n';
 
 	archivo = fopen(configuracion->cfg_file, "r");
 	if(archivo == NULL){
@@ -156,13 +154,10 @@ static bool load_config(struct config *configuracion){
 		perror("Error reading config file");
 		return false;
 	}
-	
-	if(strchr(linea, target) != NULL){
-		i = 0;
-		while(linea[i] != target){
-			i++;
-		}
-		linea[i] = '\0';
+
+	char *eol = strchr(linea, '\n');
+	if (eol){
+		*eol = '\0';
 	}
 
 	configuracion->init_mode = str2init_mode(linea);
