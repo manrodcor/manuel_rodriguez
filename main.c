@@ -5,6 +5,9 @@
 #include "gol.h"
 #include "config.h"
 #include <getopt.h>
+#include "gol_toroidal.h"
+//#include "gol_plano.h"
+#include "gol_int.h"
 
 int main(int argc, char *argv[])
 {
@@ -21,15 +24,30 @@ int main(int argc, char *argv[])
 		config_print_usage(argv[0]);
 		return EXIT_SUCCESS;
 	}
-	w = world_alloc(&configuracion);
-	if (!w) {
-		perror("Can't allocate world");
-		exit(EXIT_FAILURE);
+
+	if(configuracion.init_forma == CFG_TOROIDAL){
+
+		w = (struct world *)world_toroidal_alloc(&configuracion);
+
+		if (!w) {
+			perror("Can't allocate world");
+			exit(EXIT_FAILURE);
+		}
+
 	}
+	else if(configuracion.init_forma == CFG_PLANO){
+
+		//w = (struct world *)world_plano_alloc(&configuracion);
+		if (!w) {
+			perror("Can't allocate world");
+			exit(EXIT_FAILURE);
+		}
+	}
+
 	do {
 		printf("\033cIteration %d\n", i++);
-		world_print(w);
-		world_iterate(w);
+		world_print((struct world *)w);
+		world_iterate((struct world *)w);
 	} while (getchar() != 'q');
 	world_free(w);
 

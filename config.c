@@ -12,12 +12,18 @@ static const char *init_mode_str[] = {
 	[CFG_RANDOM] = "random",
 };
 
+static const char *cfg_forma[] = {
+	[CFG_TOROIDAL] = "toroidal",
+	[CFG_PLANO] = "plano",
+};
+
 static const struct option long_options[] =
 {
-	{ "help", no_argument, 0, 'h' },
-	{ "size_x", required_argument, 0, 'x' },
-	{ "size_y", required_argument, 0, 'y' },
+	{"help", no_argument, 0, 'h'},
+	{"size_x", required_argument, 0, 'x'},
+	{"size_y", required_argument, 0, 'y'},
 	{"mode", required_argument, 0, 'i'},
+	{"forma", required_argument, 0, 'f'},
 	{ 0, 0, 0, 0 }
 };
 
@@ -36,8 +42,9 @@ int config_parse_argv(struct config *configuracion, int argc, char *argv[])
 	configuracion->size_x = 8;
 	configuracion->size_y = 8;
 	configuracion->init_mode = CFG_RANDOM;
+	configuracion->init_forma = CFG_TOROIDAL;
 
-	while ((c = getopt_long(argc, argv, "hx:y:i:", long_options, &option_index)) != -1) {
+	while ((c = getopt_long(argc, argv, "hx:y:i:f:", long_options, &option_index)) != -1) {
 		switch (c) {
 		case 'h':
 			configuracion->show_help = true;
@@ -50,6 +57,9 @@ int config_parse_argv(struct config *configuracion, int argc, char *argv[])
 			break;
 		case 'i':
 			configuracion->init_mode = str2init_mode(optarg);
+			break;
+		case 'f':
+			configuracion->init_forma = str2init_mode(optarg);
 			break;
 		case '?':
 			return false;
@@ -80,6 +90,7 @@ static bool check_config(const struct config *configuracion)
 	correct &= configuracion->size_x > 0;
 	correct &= configuracion->size_y > 0;
 	correct &= configuracion->init_mode >= 0;
+	correct &= configuracion->init_forma >= 0;
 	return correct;
 }
 
@@ -102,6 +113,7 @@ void config_print_usage(const char *arg0)
 		"\t[-x|--size_x <num>]\n"
 		"\t[-y|--size_y <num>]\n"
 		"\t[-i|--init <init_mode>]\n"
+		"\t[-f|--init <init forma>]\n"
 		, arg0);
 
 	printf("\ninitialization modes: ");
@@ -118,6 +130,8 @@ void config_print(const struct config *configuracion)
 	printf("\tsize_y    = %d\n", configuracion->size_y);
 	printf("\tinit_mode = %d(%s)\n",
 			configuracion->init_mode, init_mode_str[configuracion->init_mode]);
+	printf("\tinit_forma = %d(%s)\n",
+				configuracion->init_forma, cfg_forma[configuracion->init_forma]);
 	printf("}\n");
 }
 
@@ -161,6 +175,19 @@ static bool load_config(struct config *configuracion){
 	}
 
 	configuracion->init_mode = str2init_mode(linea);
+
+	fgets(linea, 10, archivo);
+	if (ferror(archivo)){
+		perror("Error reading config file");
+		return false;
+	}
+
+	eol = strchr(linea, '\n');
+	if (eol){
+		*eol = '\0';
+	}
+
+	configuracion->init_forma = str2init_mode(linea);
 
 	fclose(archivo);
 	return true;

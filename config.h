@@ -14,12 +14,20 @@ enum cfg_init_mode {
 	_CFG_MAX_,
 };
 
+enum cfg_forma{
+	CFG_NOT_FORMA = -1,
+	CFG_TOROIDAL,
+	CFG_PLANO,
+	_CFG_MAX2_,
+};
+
 
 struct config {
 	bool show_help;
 	int size_x;
 	int size_y;
 	enum cfg_init_mode init_mode;
+	enum cfg_forma init_forma;
 	char *cfg_file;
 };
 
