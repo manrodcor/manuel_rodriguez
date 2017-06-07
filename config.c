@@ -5,6 +5,7 @@
 #include <string.h>
 #include <getopt.h>
 
+#define LONG_TEXT 10
 
 static const char *init_mode_str[] = {
 	[CFG_DEFAULT] = "default",
@@ -12,7 +13,7 @@ static const char *init_mode_str[] = {
 	[CFG_RANDOM] = "random",
 };
 
-static const char *cfg_forma[] = {
+static const char *init_forma[] = {
 	[CFG_TOROIDAL] = "toroidal",
 	[CFG_PLANO] = "plano",
 };
@@ -29,6 +30,7 @@ static const struct option long_options[] =
 
 static bool check_config(const struct config *configuracion);
 static enum cfg_init_mode str2init_mode(const char *opt);
+static enum cfg_init_forma str2init_forma(const char *opt);
 static bool load_config(struct config *configuracion);
 
 
@@ -59,7 +61,7 @@ int config_parse_argv(struct config *configuracion, int argc, char *argv[])
 			configuracion->init_mode = str2init_mode(optarg);
 			break;
 		case 'f':
-			configuracion->init_forma = str2init_mode(optarg);
+			configuracion->init_forma = str2init_forma(optarg);
 			break;
 		case '?':
 			return false;
@@ -106,6 +108,17 @@ static enum cfg_init_mode str2init_mode(const char *opt)
 	return i == CFG_N_INIT_MODES ? CFG_NOT_DEF : i;
 }
 
+static enum cfg_init_forma str2init_forma(const char *opt)
+{
+	int i;
+	for (i = 0; i < CFG_N_INIT_FORMA; i++){
+		if(!strcmp(init_forma[i], opt)){
+			break;
+		}
+	}
+
+	return i == CFG_N_INIT_FORMA ? CFG_NOT_FORMA : i;
+}
 void config_print_usage(const char *arg0)
 {
 	printf("Usage: %s\n"
@@ -131,7 +144,7 @@ void config_print(const struct config *configuracion)
 	printf("\tinit_mode = %d(%s)\n",
 			configuracion->init_mode, init_mode_str[configuracion->init_mode]);
 	printf("\tinit_forma = %d(%s)\n",
-				configuracion->init_forma, cfg_forma[configuracion->init_forma]);
+			configuracion->init_forma, init_forma[configuracion->init_forma]);
 	printf("}\n");
 }
 
@@ -139,7 +152,7 @@ void config_print(const struct config *configuracion)
 static bool load_config(struct config *configuracion){
 
 	FILE *archivo;
-	char linea[10];
+	char linea[LONG_TEXT];
 
 	archivo = fopen(configuracion->cfg_file, "r");
 	if(archivo == NULL){
@@ -147,7 +160,7 @@ static bool load_config(struct config *configuracion){
 	}
 
 	// Size x
-	fgets(linea, 10, archivo);
+	fgets(linea, LONG_TEXT, archivo);
 	if (ferror(archivo)){
 		perror("Error reading config file");
 		return false;
@@ -155,7 +168,7 @@ static bool load_config(struct config *configuracion){
 	configuracion->size_x = strtol(linea, NULL, 0);
 
 	// Size y
-	fgets(linea, 10, archivo);
+	fgets(linea, LONG_TEXT, archivo);
 	if (ferror(archivo)){
 		perror("Error reading config file");
 		return false;
@@ -163,7 +176,7 @@ static bool load_config(struct config *configuracion){
 	configuracion->size_y = strtol(linea, NULL, 0);
 
 	// Mode
-	fgets(linea, 10, archivo);
+	fgets(linea, LONG_TEXT, archivo);
 	if (ferror(archivo)){
 		perror("Error reading config file");
 		return false;
@@ -176,7 +189,7 @@ static bool load_config(struct config *configuracion){
 
 	configuracion->init_mode = str2init_mode(linea);
 
-	fgets(linea, 10, archivo);
+	fgets(linea, LONG_TEXT, archivo);
 	if (ferror(archivo)){
 		perror("Error reading config file");
 		return false;
