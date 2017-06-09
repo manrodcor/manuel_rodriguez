@@ -295,3 +295,13 @@ Notas:
     Has de crear dos nuevas opciones getopt para indicar el nombre del archivo a guardar y a cargar
     Para guardar el estado, haz un volcado directo en binario del array en un archivo. Utiliza la función fwrite pasándole tu array y su tamaño. Ten en cuenta que debes guardar también las dimensiones de tu mundo.
     Para cargar el estado, haz una lectura directa del archivo binario con la función fread. Puedes volcar el contenido del archivo directamente en el array de tu estructura, pero no olvides reservar la memoria primero (para esto debes leer antes las dimensiones de tu mundo) 
+
+ Tarea 6: Herencia
+
+    Divide tu arquitectura en tres objetos:
+        world: Objeto abstracto que no tienen implementada las funciones world_get_cell y world_set_cell, pero sí el resto
+        world_limited: Objeto que hereda de world e implementa las funciones world_get_cell y world_set_cell de forma que se devuelva una célula muerta si los índices se salen del array y no haga nada en el caso del setter
+        world_toroidal: Objeto que hereda de world e implementa las funciones world_get_cell y world_set_cell para accedar al mundo de forma toroidal. Aquí además debes implementar la función fix_coords para usarla en tu getter y setter. 
+
+Herencia.png 
+

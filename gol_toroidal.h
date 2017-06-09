@@ -5,6 +5,5 @@
 #include <stdbool.h>
 
 struct world_toroidal *world_toroidal_alloc(struct config *configuracion);
-void world_init_toroidal(struct world_toroidal *wt);
 
 #endif

@@ -126,13 +126,17 @@ void config_print_usage(const char *arg0)
 		"\t[-x|--size_x <num>]\n"
 		"\t[-y|--size_y <num>]\n"
 		"\t[-i|--init <init_mode>]\n"
-		"\t[-f|--init <init forma>]\n"
+		"\t[-f|--init <init_forma>]\n"
 		, arg0);
 
-	printf("\ninitialization modes: ");
+	printf("\nInitialization mode: ");
 	printf("\nModo %s ", init_mode_str[0]);
 	printf("\nModo %s ", init_mode_str[1]);
 	printf("\nModo %s \n", init_mode_str[2]);
+
+	printf("\nInicialization type: ");
+	printf("\nTipo %s ", init_forma[0]);
+	printf("\nTipo %s \n", init_forma[1]);
 }
 
 void config_print(const struct config *configuracion)
@@ -200,7 +204,7 @@ static bool load_config(struct config *configuracion){
 		*eol = '\0';
 	}
 
-	configuracion->init_forma = str2init_mode(linea);
+	configuracion->init_forma = str2init_forma(linea);
 
 	fclose(archivo);
 	return true;

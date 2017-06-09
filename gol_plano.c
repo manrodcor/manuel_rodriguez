@@ -7,35 +7,34 @@
 #include <getopt.h>
 #include "gol.h"
 #include "gol_int.h"
-#include "gol_toroidal.h"
+#include "gol_plano.h"
 
-struct world_toroidal{
+struct world_plano{
 	struct world super;
 };
 
-static void fix_coords_t(const struct world *w, int *x, int *y);
-static bool get_cell_t(const struct world *w, int x, int y);
-static void set_cell_t(struct world *w, int buf, int x, int y, bool val);
-static int count_neighbors_t(const struct world *w, int x, int y);
-static void world_iterate_t(struct world *w);
-static void world_print_t(const struct world *w);
+static bool get_cell_p(const struct world *w, int x, int y);
+static void set_cell_p(struct world *w, int buf, int x, int y, bool val);
+static int count_neighbors_p(const struct world *w, int x, int y);
+static void world_iterate_p(struct world *w);
+static void world_print_p(const struct world *w);
 
 
-struct world_toroidal *world_toroidal_alloc(struct config *configuracion)
+struct world_plano *world_plano_alloc(struct config *configuracion)
 {
 	int i, j;
-	struct world_toroidal *w;
-	w = (struct world_toroidal *)malloc(2 * sizeof(struct world_toroidal));
+	struct world_plano *w;
+	w = (struct world_plano *)malloc(2 * sizeof(struct world_plano));
 	if(!w){
 		return NULL;
 	}
 	world_init((struct world *)w, configuracion);
 
-	w->super.get_cell = get_cell_t;
-	w->super.set_cell = set_cell_t;
-	w->super.world_iterate = world_iterate_t;
-	w->super.world_print = world_print_t;
-	w->super.count_neighbors = count_neighbors_t;
+	w->super.get_cell = get_cell_p;
+	w->super.set_cell = set_cell_p;
+	w->super.world_iterate = world_iterate_p;
+	w->super.world_print = world_print_p;
+	w->super.count_neighbors = count_neighbors_p;
 
 	int modo = configuracion->init_mode;
 	w->super.size_x = configuracion->size_x;;
@@ -90,7 +89,7 @@ struct world_toroidal *world_toroidal_alloc(struct config *configuracion)
 	return w;
 }
 
-static void world_print_t(const struct world *w)
+static void world_print_p(const struct world *w)
 {
 	int i;
 	int j;
@@ -104,7 +103,7 @@ static void world_print_t(const struct world *w)
 
 }
 
-static void world_iterate_t(struct world *w)
+static void world_iterate_p(struct world *w)
 {
 	int i;
 	int j;
@@ -116,7 +115,7 @@ static void world_iterate_t(struct world *w)
 
 	for(i = 0; i < w->size_y; i++){
 		for(j = 0; j < w->size_x; j++){
-			nVecinos = count_neighbors_t((struct world *)w, j, i);
+			nVecinos = count_neighbors_p((struct world *)w, j, i);
 			val = (w->get_cell(w, j, i) && nVecinos == 2) || nVecinos == 3;
 			w->set_cell(w, selectMatriz, j, i, val);
 		}
@@ -124,37 +123,17 @@ static void world_iterate_t(struct world *w)
 	w->flanco = !w->flanco;
 }
 
-
-static void fix_coords_t(const struct world *w, int *x, int *y)
+static bool get_cell_p(const struct world *w, int x, int y)
 {
-	if(*x == -1){
-		*x = w->size_x - 1;
-	}
-	else if(*x == w->size_x){
-		*x = 0;
-	}
-	if(*y == -1){
-		*y = w->size_y - 1;
-	}
-	else if(*y == w->size_y){
-		*y = 0;
-	}
-}
-
-static bool get_cell_t(const struct world *w, int x, int y)
-{
-	fix_coords_t(w, &x, &y);
 	return w->cells[w->flanco][y * w->size_x + x];
-
 }
 
-static void set_cell_t(struct world *w, int buf, int x, int y, bool val)
+static void set_cell_p(struct world *w, int buf, int x, int y, bool val)
 {
-	fix_coords_t(w, &x, &y);
 	w->cells[buf][y * w->size_x + x] = val;
 }
 
-static int count_neighbors_t(const struct world *w, int x, int y)
+static int count_neighbors_p(const struct world *w, int x, int y)
 {
 	int numeroVecinos = 0;
 
